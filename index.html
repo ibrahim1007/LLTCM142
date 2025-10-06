@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Manajemen Risiko Forex</title>
+    <!-- Menggunakan Tailwind CSS untuk styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Menggunakan Google Fonts untuk tipografi yang lebih baik -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Menggunakan font Inter sebagai default */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Style kustom untuk input number agar tidak ada panah */
+        input[type='number']::-webkit-inner-spin-button,
+        input[type='number']::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type='number'] {
+            -moz-appearance: textfield;
+        }
+        /* Style untuk menyembunyikan elemen */
+        .hidden-result {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 flex flex-col items-center justify-center min-h-screen p-4 pt-24">
+
+    <header class="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md shadow-sm z-50 border-b border-gray-200">
+        <nav class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <span class="font-thin text-2xl text-gray-800">LEODRA</span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-lg border border-gray-200">
+        
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-black">Risk Management Calculator</h1>
+            <p class="text-gray-500 mt-2">Masukkan parameter trading Anda.</p>
+        </div>
+
+        <!-- Form Input Baru -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Kolom Kiri -->
+            <div class="space-y-4">
+                <div>
+                    <label for="accountBalance" class="block text-sm font-medium text-gray-700">Saldo Akun ($)</label>
+                    <input type="number" id="accountBalance" value="10000" class="mt-1 w-full bg-gray-50 border-gray-300 rounded-md p-2 text-gray-900 focus:ring-2 focus:ring-cyan-500">
+                </div>
+                <div>
+                    <label for="riskPercent" class="block text-sm font-medium text-gray-700">Risiko per Trade (%)</label>
+                    <input type="number" id="riskPercent" value="1" step="0.1" class="mt-1 w-full bg-gray-50 border-gray-300 rounded-md p-2 text-gray-900 focus:ring-2 focus:ring-cyan-500">
+                </div>
+                <div>
+                    <label for="pair" class="block text-sm font-medium text-gray-700">Pairs</label>
+                    <select id="pair" class="mt-1 w-full bg-gray-50 border-gray-300 rounded-md p-2 text-gray-900 focus:ring-2 focus:ring-cyan-500">
+                        <option value="EUR/USD">EUR/USD</option>
+                        <option value="GBP/USD">GBP/USD</option>
+                        <option value="AUD/USD">AUD/USD</option>
+                        <option value="NZD/JPY">NZD/JPY</option>
+                    </select>
+                </div>
+                 <div>
+                    <label for="transactionType" class="block text-sm font-medium text-gray-700">Transaksi</label>
+                    <select id="transactionType" class="mt-1 w-full bg-gray-50 border-gray-300 rounded-md p-2 text-gray-900 focus:ring-2 focus:ring-cyan-500">
+                        <option value="buy">Buy</option>
+                        <option value="sell">Sell</option>
+                    </select>
+                </div>
+            </div>
+            <!-- Kolom Kanan -->
+            <div class="space-y-4">
+                <div>
+                    <label for="openPrice" class="block text-sm font-medium text-gray-700">Open Price</label>
+                    <input type="number" id="openPrice" step="0.00001" placeholder="cth: 1.07500" class="mt-1 w-full bg-gray-50 border-gray-300 rounded-md p-2 text-gray-900 focus:ring-2 focus:ring-cyan-500">
+                </div>
+                <div>
+                    <label for="tpPrice" class="block text-sm font-medium text-gray-700">TP Price</label>
+                    <input type="number" id="tpPrice" step="0.00001" placeholder="cth: 1.08000" class="mt-1 w-full bg-gray-50 border-gray-300 rounded-md p-2 text-gray-900 focus:ring-2 focus:ring-cyan-500">
+                </div>
+                <div>
+                    <label for="rrInput" class="block text-sm font-medium text-gray-700">Risk/Reward Ratio (RR)</label>
+                    <input type="text" id="rrInput" value="1:2" placeholder="cth: 1:2.5" class="mt-1 w-full bg-gray-50 border-gray-300 rounded-md p-2 text-gray-900 focus:ring-2 focus:ring-cyan-500">
+                </div>
+            </div>
+        </div>
+
+        <!-- Tombol Eksekusi -->
+        <div class="mt-8">
+            <button id="executeButton" class="w-full bg-black hover:bg-gray-800 text-white font-bold py-3 px-4 rounded-lg transition-transform transform hover:scale-105 shadow-lg">
+                Eksekusi Perhitungan
+            </button>
+        </div>
+
+        <!-- Hasil Perhitungan (Awalnya tersembunyi) -->
+        <div id="resultSection" class="hidden-result mt-8 border-t-2 border-black pt-6">
+            <h2 class="text-xl font-semibold text-center text-black mb-4">Hasil Perhitungan</h2>
+            <div class="space-y-3">
+                <div class="flex justify-between items-center bg-gray-100 p-3 rounded-lg">
+                    <span>Risk/Reward Ratio (RR)</span>
+                    <span id="resultRR" class="font-bold text-lg">1 : 2.00</span>
+                </div>
+                <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                    <span>PIPS SL / TP</span>
+                    <span id="resultPips" class="font-bold text-lg"><span class="text-red-500">25.0</span> / <span class="text-green-600">50.0</span></span>
+                </div>
+                 <div class="flex justify-between items-center bg-gray-100 p-3 rounded-lg">
+                    <span>SL Price</span>
+                    <span id="resultSlPrice" class="font-bold text-lg">1.07250</span>
+                </div>
+                <div class="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                    <span>SL DOLAR / TP DOLAR</span>
+                    <span id="resultDollars" class="font-bold text-lg"><span class="text-red-500">$-100.00</span> / <span class="text-green-600">$+200.00</span></span>
+                </div>
+                <div class="flex justify-between items-center bg-gray-100 p-4 rounded-lg border-2 border-black">
+                    <span class="font-semibold text-lg">Ukuran Posisi (LOTS)</span>
+                    <span id="resultLots" class="font-bold text-2xl text-black">0.40</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.getElementById('executeButton').addEventListener('click', () => {
+            // Data pair untuk perhitungan pips dan nilai per pip
+            const pairDetails = {
+                'EUR/USD': { pipMultiplier: 10000, decimals: 5, valuePerPip: 9 },
+                'GBP/USD': { pipMultiplier: 10000, decimals: 5, valuePerPip: 10 },
+                'AUD/USD': { pipMultiplier: 10000, decimals: 5, valuePerPip: 10 },
+                'NZD/JPY': { pipMultiplier: 100, decimals: 3, valuePerPip: 6 }
+            };
+
+            // Mengambil nilai dari input
+            const accountBalance = parseFloat(document.getElementById('accountBalance').value);
+            const riskPercent = parseFloat(document.getElementById('riskPercent').value);
+            const pair = document.getElementById('pair').value;
+            const transactionType = document.getElementById('transactionType').value;
+            const openPrice = parseFloat(document.getElementById('openPrice').value);
+            const tpPrice = parseFloat(document.getElementById('tpPrice').value);
+            const rrInput = document.getElementById('rrInput').value;
+
+            // Parse RR Input
+            const rrParts = rrInput.split(':');
+            const riskRewardRatio = rrParts.length === 2 ? parseFloat(rrParts[1]) : NaN;
+
+            // Validasi input
+            if (isNaN(accountBalance) || isNaN(riskPercent) || isNaN(openPrice) || isNaN(tpPrice) || isNaN(riskRewardRatio)) {
+                alert("Mohon isi semua kolom dengan format yang benar. Pastikan RR dalam format '1:X'.");
+                return;
+            }
+            if (riskRewardRatio <= 0) {
+                alert("Reward ratio harus lebih besar dari 0.");
+                return;
+            }
+
+            const selectedPair = pairDetails[pair];
+
+            // 1. Hitung PIPS TP
+            let pipsTP;
+            if (transactionType === 'buy') {
+                pipsTP = (tpPrice - openPrice) * selectedPair.pipMultiplier;
+            } else { // sell
+                pipsTP = (openPrice - tpPrice) * selectedPair.pipMultiplier;
+            }
+            if(pipsTP <= 0) {
+                alert("Harga TP tidak valid. Untuk posisi BUY, TP harus di atas Open Price. Untuk posisi SELL, TP harus di bawah Open Price.");
+                return;
+            }
+
+            // 2. Hitung SL PIPS berdasarkan RR
+            const slPips = pipsTP / riskRewardRatio;
+
+            // 3. Hitung SL dalam Dolar berdasarkan risiko akun
+            const maxRiskAmount = accountBalance * (riskPercent / 100);
+
+            // 4. Hitung Lot Size
+            if (slPips === 0 || selectedPair.valuePerPip === 0) {
+                 alert("Perhitungan tidak valid. Stop loss pips tidak boleh nol.");
+                 return;
+            }
+            const lotSize = maxRiskAmount / (slPips * selectedPair.valuePerPip);
+
+            // 5. Hitung SL & TP dalam Dolar berdasarkan rumus: Lots * Pips * Pip Value
+            const slDollar = lotSize * slPips * selectedPair.valuePerPip;
+            const tpDollar = lotSize * pipsTP * selectedPair.valuePerPip;
+
+            // 6. Hitung SL Price
+            const slPrice = (transactionType === 'buy')
+                ? openPrice - (slPips / selectedPair.pipMultiplier)
+                : openPrice + (slPips / selectedPair.pipMultiplier);
+
+            // Menampilkan hasil
+            document.getElementById('resultRR').textContent = `1 : ${riskRewardRatio.toFixed(2)}`;
+            document.getElementById('resultPips').innerHTML = `<span class="text-red-500">${slPips.toFixed(1)}</span> / <span class="text-green-600">${pipsTP.toFixed(1)}</span>`;
+            document.getElementById('resultSlPrice').textContent = slPrice.toFixed(selectedPair.decimals);
+            document.getElementById('resultDollars').innerHTML = `<span class="text-red-500">-$${slDollar.toFixed(2)}</span> / <span class="text-green-600">+$${tpDollar.toFixed(2)}</span>`;
+            document.getElementById('resultLots').textContent = lotSize.toFixed(2);
+            
+            // Tampilkan section hasil
+            document.getElementById('resultSection').style.display = 'block';
+        });
+    </script>
+
+</body>
+</html>
+
+
+
+
+
